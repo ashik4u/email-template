@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Air Ticket Issuing Request to Vendor Email</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f9f9f9; }
+        .container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px #ccc; max-width: 700px; margin: auto; }
+        .btn-row { display: flex; gap: 10px; margin-bottom: 18px; }
+        button { padding: 8px 16px; background: #007bff; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+        button:hover { background: #0056b3; }
+        #notification-bar { display:none; background:#28a745; color:#fff; padding:8px; border-radius:4px; margin-bottom:10px; text-align:center; font-size:14px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="btn-row">
+        <button onclick="copyEmailContent()">Copy to Clipboard</button>
+        <button onclick="window.location.href='/'">Back to Dashboard</button>
+    </div>
+    <div id="notification-bar"></div>
+    <div id="email-content">
+        {% if guest %}
+        <p>Dear Mr. Zilan,<br><br>
+        {% if guest.id == 'kapil' %}
+        Please see the email below for your reference. Kindly issue the ticket and update the travel tracker. Please book {{ guest.instructions }}.<br><br>
+        {% elif guest.id == 'prabir' %}
+        Please issue the ticket and update the travel tracker as per the email confirmation below. Depending on availability, kindly book a {{ guest.instructions }}.<br><br>
+        {% else %}
+        Please issue the ticket and update the travel tracker as per the email confirmation below.<br><br>
+        {% endif %}
+        Project Code: {{ guest.project_code }}<br>
+        Name: {{ guest.name }}<br>
+        Email: {{ guest.email }}<br>
+        Mobile: {{ guest.mobile }}<br><br>
+        Let me know if you have any questions.</p>
+        {% endif %}
+    </div>
+</div>
+<script>
+function showNotification(msg) {
+    var bar = document.getElementById('notification-bar');
+    bar.innerText = msg;
+    bar.style.display = 'block';
+    setTimeout(function() { bar.style.display = 'none'; }, 2000);
+}
+function copyEmailContent() {
+    var content = document.getElementById('email-content');
+    var range = document.createRange();
+    range.selectNode(content);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+    try {
+        document.execCommand('copy');
+        window.getSelection().removeAllRanges();
+        showNotification('Email content copied to clipboard!');
+    } catch (err) {
+        showNotification('Failed to copy. Please select and copy manually.');
+    }
+}
+</script>
+</body>
+</html>

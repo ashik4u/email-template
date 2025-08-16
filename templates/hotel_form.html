@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hotel Reservation Form</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f9f9f9; }
+        .container { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px #ccc; max-width: 600px; margin: auto; }
+        h2 { color: #2a2a2a; font-size: 24px; margin-bottom: 20px; }
+        label { display: block; margin-top: 10px; font-size: 14px; }
+        input, select { width: 100%; padding: 8px; margin-top: 5px; border-radius: 4px; border: 1px solid #ccc; font-size: 14px; }
+        button { margin-top: 15px; padding: 10px 20px; background: #007bff; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #0056b3; }
+        .form-row { margin-bottom: 10px; }
+        .two-column { display: flex; gap: 24px; }
+        .two-column > div { flex: 1; }
+        .guest-section { border: 1px solid #eee; padding: 16px; margin-bottom: 16px; border-radius: 8px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Hotel Reservation Request</h2>
+    <form method="POST">
+        <div id="guest-sections">
+            <div class="guest-section" style="border:1px solid #eee; padding:16px; margin-bottom:16px; border-radius:8px;">
+                <div class="two-column" style="display: flex; gap: 24px;">
+                    <div style="flex:1;">
+                        <div class="form-row">
+                            <label for="name1">Name:</label>
+                            <select name="name1" id="name1" required>
+                                {% for n in names %}
+                                <option value="{{ n }}">{{ n }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-row">
+                            <label for="checkin1">Check-In Date:</label>
+                            <input type="date" name="checkin1" id="checkin1" required>
+                        </div>
+                        <div class="form-row">
+                            <label for="room_type1">Room Type:</label>
+                            <select name="room_type1" id="room_type1" required>
+                                <option value="Standard Room">Standard Room</option>
+                                <option value="Upgraded Category-1">Upgraded Category-1</option>
+                                <option value="Upgraded Category-2">Upgraded Category-2</option>
+                                <option value="Upgraded Category-3">Upgraded Category-3</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="flex:1;">
+                        <div class="form-row">
+                            <label for="checkout1">Check-Out Date:</label>
+                            <input type="date" name="checkout1" id="checkout1" required>
+                        </div>
+                        <div class="form-row">
+                            <label for="payment_mode1">Payment Mode:</label>
+                            <input type="text" name="payment_mode1" id="payment_mode1" value="Direct by the guest" required>
+                        </div>
+                        <div class="form-row">
+                            <label for="airport_transfer1">Airport Transfer:</label>
+                            <select name="airport_transfer1" id="airport_transfer1" required onchange="toggleAirportInfo(1)">
+                                <option value="Not required">Not required</option>
+                                <option value="Required">Required</option>
+                            </select>
+                        </div>
+                        <div class="form-row" id="airport_info_row1" style="display:none;">
+                            <label for="airport_info1">Airport Transfer Note:</label>
+                            <input type="text" name="airport_info1" id="airport_info1" placeholder="Enter note (e.g. flight number, pickup time)">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button type="button" onclick="addGuestSection()" style="margin-top:10px;">Add Another Guest</button>
+        <button type="button" onclick="window.location.href='/'" style="margin-top:10px;">Back to Dashboard</button>
+        <button type="submit">Generate Hotel Reservation Email</button>
+    </form>
+</div>
+<script>
+var guestNames = {{ names|tojson }};
+var guestIndex = 1;
+function addGuestSection() {
+    guestIndex++;
+    var guestSections = document.getElementById('guest-sections');
+    var section = document.createElement('div');
+    section.className = 'guest-section';
+    section.style = 'border:1px solid #eee; padding:16px; margin-bottom:16px; border-radius:8px;';
+    section.innerHTML = `
+        <div class="two-column" style="display: flex; gap: 24px;">
+            <div style="flex:1;">
+                <div class="form-row">
+                    <label for="name${guestIndex}">Name:</label>
+                    <select name="name${guestIndex}" id="name${guestIndex}" required></select>
+                </div>
+                <div class="form-row">
+                    <label for="checkin${guestIndex}">Check-In Date:</label>
+                    <input type="date" name="checkin${guestIndex}" id="checkin${guestIndex}" required>
+                </div>
+                <div class="form-row">
+                    <label for="room_type${guestIndex}">Room Type:</label>
+                    <select name="room_type${guestIndex}" id="room_type${guestIndex}" required>
+                        <option value="Standard Room">Standard Room</option>
+                        <option value="Upgraded Category-1">Upgraded Category-1</option>
+                        <option value="Upgraded Category-2">Upgraded Category-2</option>
+                        <option value="Upgraded Category-3">Upgraded Category-3</option>
+                    </select>
+                </div>
+            </div>
+            <div style="flex:1;">
+                <div class="form-row">
+                    <label for="checkout${guestIndex}">Check-Out Date:</label>
+                    <input type="date" name="checkout${guestIndex}" id="checkout${guestIndex}" required>
+                </div>
+                <div class="form-row">
+                    <label for="payment_mode${guestIndex}">Payment Mode:</label>
+                    <input type="text" name="payment_mode${guestIndex}" id="payment_mode${guestIndex}" value="Direct by the guest" required>
+                </div>
+                <div class="form-row">
+                    <label for="airport_transfer${guestIndex}">Airport Transfer:</label>
+                    <select name="airport_transfer${guestIndex}" id="airport_transfer${guestIndex}" required onchange="toggleAirportInfo(${guestIndex})">
+                        <option value="Not required">Not required</option>
+                        <option value="Required">Required</option>
+                    </select>
+                </div>
+                <div class="form-row" id="airport_info_row${guestIndex}" style="display:none;">
+                    <label for="airport_info${guestIndex}">Airport Transfer Note:</label>
+                    <input type="text" name="airport_info${guestIndex}" id="airport_info${guestIndex}" placeholder="Enter note (e.g. flight number, pickup time)">
+                </div>
+            </div>
+        </div>
+    `;
+    guestSections.appendChild(section);
+    // Populate names dropdown
+    var select = section.querySelector(`#name${guestIndex}`);
+    guestNames.forEach(function(n) {
+        var option = document.createElement('option');
+        option.value = n;
+        option.text = n;
+        select.appendChild(option);
+    });
+}
+function toggleAirportInfo(idx) {
+    var transfer = document.getElementById('airport_transfer' + idx).value;
+    var infoRow = document.getElementById('airport_info_row' + idx);
+    if (transfer === 'Required') {
+        infoRow.style.display = '';
+    } else {
+        infoRow.style.display = 'none';
+        document.getElementById('airport_info' + idx).value = '';
+    }
+}
+window.onload = function() { toggleAirportInfo(1); };
+</script>
+</body>
+</html>

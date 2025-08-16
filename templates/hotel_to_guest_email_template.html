@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hotel Details to Guest Email</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f9f9f9; }
+        .container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px #ccc; max-width: 700px; margin: auto; }
+        .btn-row { display: flex; gap: 10px; margin-bottom: 18px; }
+        button { padding: 8px 16px; background: #007bff; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+        button:hover { background: #0056b3; }
+        #notification-bar { display:none; background:#28a745; color:#fff; padding:8px; border-radius:4px; margin-bottom:10px; text-align:center; font-size:14px; }
+        .section { margin-bottom: 20px; }
+        ul { margin: 0; padding-left: 20px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="btn-row">
+        <button onclick="copyEmailContent()">Copy to Clipboard</button>
+        <button onclick="window.location.href='/'">Back to Dashboard</button>
+    </div>
+    <div id="notification-bar"></div>
+    <div id="email-content">
+        <p>Dear {},<br><br>
+        Please find the confirmation of the room reservations attached. The payment mode is direct, i.e., credit card or cash.<br><br>
+        <strong>Airport Pickup/Drop:</strong> Complementary Airport transfer is confirmed by the Hotel. Please find the airport protocol details below.<br><br>
+        <strong>Work in office:</strong> Use the Reservations application (MoveinSync) to book cabins, meeting rooms, and workstations when you plan to visit the office.<br><br>
+        Please adhere to the Safety and Security instructions below while you are traveling to Bangladesh.<br></p>
+        <div class="section">
+            <strong><u>Safety and Security Instructions</u></strong><br><br>
+            All travelers must follow the instructions outlined below while traveling to Bangladesh.<br><br>
+            <strong>Do’s and Don’ts</strong>
+            <ol>
+                <li>Travelers shall inform the Global Mobility team immediately if they face any issues at airport immigration. Contact: <strong>AKM Redhwan Sarwar</strong> at <strong>+8801914208140</strong> or <strong>+8809610974000</strong>.</li>
+                <li>Travelers should limit and avoid non-essential intra-city or inter-district travel.</li>
+                <li>All travelers should be accompanied by a local staff member from the concerned business team during any movement for client/business meetings. If a local staff member is not available from the concerned business team, the local Markets team should accompany the traveler.</li>
+                <li>It is advisable that all movements be completed during normal business hours only.</li>
+                <li>Travelers must always carry their PwC ID card while traveling on business.</li>
+                <li>Travelers must not stay in non-PwC-approved properties. If travel/stay arrangements are made by the client, these should be documented during the OCTA approval process, and the property details must be shared with the local Business Services team for their review and approval.</li>
+                <li>Travelers should avoid using public transportation during the trip. They must use transportation from PwC-enlisted cab service providers only, arranged via the local Business Services team.</li>
+                <li>Travelers must inform the local Business Services team immediately if there is any sudden change in the travel plan. The local Business Services team will assess the situation and guide the traveler accordingly.</li>
+                <li>Staff are requested to adhere to all safety and security directives issued by the firm/Business Services team to avoid any contingencies.</li>
+                <li>All travelers shall maintain awareness of local news and be aware of their surroundings at all times.</li>
+                <li>All travelers shall not attempt to cross any roadblocks or any congregation of people.</li>
+                <li>All travelers shall not attempt to intervene in any verbal or physical confrontations, or film or photograph disturbances they may come across.</li>
+                <li>It is recommended to purchase a local mobile SIM upon arrival at the airport for ease of communication and to share the number with the local Business Services POC.</li>
+                <li>Travelers are requested to check the <a href="https://myportal.internationalsos.com/" target="_blank">International SOS Portal</a>, which is accessible to all PwC staff, to consult security and medical information per country.</li>
+                <li>For any assistance, travelers should reach out to the local Business Services POC immediately: <strong>A S M Rifter Hussain</strong> at <strong>+8801718136902</strong> or <strong>Ashikul Islam</strong> at <strong>+8801673534756</strong> or <strong>+8809610974000</strong>.</li>
+            </ol>
+        </div>
+        <p>Please let us know if you have any queries. Have a safe travel.</p>
+    </div>
+</div>
+<script>
+function showNotification(msg) {
+    var bar = document.getElementById('notification-bar');
+    bar.innerText = msg;
+    bar.style.display = 'block';
+    setTimeout(function() { bar.style.display = 'none'; }, 2000);
+}
+function copyEmailContent() {
+    var content = document.getElementById('email-content');
+    var range = document.createRange();
+    range.selectNode(content);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+    try {
+        document.execCommand('copy');
+        window.getSelection().removeAllRanges();
+        showNotification('Email content copied to clipboard!');
+    } catch (err) {
+        showNotification('Failed to copy. Please select and copy manually.');
+    }
+}
+</script>
+</body>
+</html>

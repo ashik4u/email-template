@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Email Template Form</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f9f9f9; }
+        .container { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px #ccc; max-width: 600px; margin: auto; }
+        h2 { color: #2a2a2a; font-size: 24px; margin-bottom: 20px; }
+        label { display: block; margin-top: 10px; font-size: 14px; }
+        input, select { width: 100%; padding: 8px; margin-top: 5px; border-radius: 4px; border: 1px solid #ccc; font-size: 14px; }
+        button { margin-top: 15px; padding: 10px 20px; background: #007bff; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #0056b3; }
+        .form-row { margin-bottom: 10px; }
+        .date-row { display: flex; justify-content: space-between; }
+        .date-row label { flex-basis: 30%; }
+        .date-row input, .date-row select { flex-basis: 65%; }
+        .two-column { display: flex; gap: 24px; }
+        .two-column > div { flex: 1; }
+        .error-message { background: #ffdddd; color: #a94442; padding: 10px; border-radius: 4px; margin-bottom: 16px; border: 1px solid #a94442; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Create Email Template</h2>
+    {% if error %}
+    <div style="background:#ffdddd;color:#a94442;padding:10px;border-radius:4px;margin-bottom:16px;border:1px solid #a94442;">
+        {{ error }}
+    </div>
+    {% endif %}
+    <form method="POST">
+        <div class="two-column">
+            <div>
+                <div class="form-row">
+                    <label for="name">Name:</label>
+                    <select name="name" id="name" required>
+                        {% for n in names %}
+                        <option value="{{ n }}">{{ n }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label for="service_location">Location:</label>
+                    <select name="service_location" id="service_location" required>
+                        {% for loc in locations %}
+                        <option value="{{ loc }}">{{ loc }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label for="pax">Pax:</label>
+                    <input type="number" name="pax" id="pax" min="1" value="1" required>
+                </div>
+            </div>
+            <div>
+                <div class="form-row">
+                    <label for="car_type">Car Type:</label>
+                    <select name="car_type" id="car_type" required>
+                        <option value="Sedan">Sedan</option>
+                        <option value="MPV/Microbus">MPV/Microbus</option>
+                        <option value="SUV">SUV</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label for="project_code">Project Code:</label>
+                    <input type="text" name="project_code" id="project_code" placeholder="e.g. 498000010" required>
+                </div>
+            </div>
+        </div>
+        <div style="display: flex; gap: 24px;">
+            <div style="flex:1;">
+                <div class="form-row">
+                    <label for="date_mode">Reporting Mode:</label>
+                    <select name="date_mode" id="date_mode" onchange="toggleDateMode()">
+                        <option value="range" selected>Date to Date (range)</option>
+                        <option value="multiple">Multiple Dates</option>
+                    </select>
+                </div>
+            </div>
+            <div style="flex:1;">
+                <div class="form-row" style="display: flex; gap: 24px; align-items: center;">
+                    <input type="checkbox" id="range_same_service_type" name="range_same_service_type" checked onchange="toggleRangeServiceTypeMode()">
+                    <label for="range_same_service_type">Service type same for all dates</label>
+                </div>
+            </div>
+        </div>
+        <div id="reporting_section">
+            <h3 style="margin-bottom:8px;font-size:16px;">Reporting Time & Location (for all days)</h3>
+            <div id="date_range_fields">
+                <div class="form-row" style="display: flex; gap: 24px; align-items: center;">
+                    <div style="flex:1;">
+                        <label for="service_start">Start Date:</label>
+                        <input type="date" name="service_start" id="service_start" required>
+                    </div>
+                    <div style="flex:1;">
+                        <label for="service_end">End Date:</label>
+                        <input type="date" name="service_end" id="service_end">
+                    </div>
+                </div>
+                <div id="service_type_range_selector" class="form-row">
+                    <label for="service_type_range_value">Service Type for Range:</label>
+                    <select name="service_type_range_value" id="service_type_range_value">
+                        <option value="12 Hours Service">12 Hours Service</option>
+                        <option value="9 Hours Service">9 Hours Service</option>
+                        <option value="6 Hours Service">6 Hours Service</option>
+                        <option value="4 Hours Service">4 Hours Service</option>
+                        <option value="Airport Transfer">Airport Transfer</option>
+                    </select>
+                </div>
+                <div id="service_type_range_notes" class="form-row"></div>
+                <div id="service_type_range_individual" style="display:none;"></div>
+            </div>
+            <div id="date_multiple_fields" style="display:none;">
+                <div class="form-row">
+                    <input type="checkbox" id="same_service_type" name="same_service_type" checked onchange="toggleServiceTypeMode()">
+                    <label for="same_service_type">Service type same for all dates</label>
+                </div>
+                <div id="date_fields">
+                    <div class="date-row" id="date_row_1">
+                        <label for="service_date1">Date 1:</label>
+                        <input type="date" name="service_date1" id="service_date1">
+                    </div>
+                </div>
+                <button type="button" onclick="addDateField()" id="add_date_btn">Add another date</button>
+                <div id="service_type_all_selector" class="form-row">
+                    <label for="service_type_all_value">Service Type for All Dates:</label>
+                    <select name="service_type_all_value" id="service_type_all_value">
+                        <option value="Airport Transfer">Airport Transfer</option>
+                        <option value="4 Hours Service">4 Hours Service</option>
+                        <option value="6 Hours Service">6 Hours Service</option>
+                        <option value="9 Hours Service">9 Hours Service</option>
+                        <option value="12 Hours Service">12 Hours Service</option>
+                    </select>
+                </div>
+                <div id="service_type_all_note" class="form-row">
+                    <label for="note_all">Note for all dates:</label>
+                    <input type="text" name="note_all" id="note_all" placeholder="e.g. 9 PM at Westin">
+                </div>
+            </div>
+        </div>
+        <button type="button" onclick="window.location.href='/'" style="margin-top:10px;">Back to Dashboard</button>
+        <button type="submit">Generate Email Template</button>
+    </form>
+</div>
+<script>
+var dateCount = 1;
+var maxDates = 4;
+function toggleDateMode() {
+    var rangeMode = document.getElementById('date_mode').value === 'range';
+    document.getElementById('date_range_fields').style.display = rangeMode ? 'block' : 'none';
+    document.getElementById('date_multiple_fields').style.display = rangeMode ? 'none' : 'block';
+    if (!rangeMode) renderMultipleDateFields();
+}
+function toggleRangeServiceTypeMode() {
+    var sameType = document.getElementById('range_same_service_type').checked;
+    var individualDiv = document.getElementById('service_type_range_individual');
+    var noteDiv = document.getElementById('service_type_range_notes');
+    if (!noteDiv) {
+        noteDiv = document.createElement('div');
+        noteDiv.id = 'service_type_range_notes';
+        document.getElementById('date_range_fields').appendChild(noteDiv);
+    }
+    if (sameType) {
+        document.getElementById('service_type_range_selector').style.display = 'block';
+        individualDiv.style.display = 'none';
+        // Show note fields for each date
+        noteDiv.style.display = 'block';
+        noteDiv.innerHTML = '';
+        var noteLabel = document.createElement('label');
+        noteLabel.innerText = 'Note for all dates:';
+        var noteInput = document.createElement('input');
+        noteInput.type = 'text';
+        noteInput.name = 'note_all';
+        noteInput.id = 'note_all';
+        noteInput.placeholder = 'e.g. 9 PM at Westin';
+        noteDiv.appendChild(noteLabel);
+        noteDiv.appendChild(noteInput);
+    } else {
+        document.getElementById('service_type_range_selector').style.display = 'none';
+        individualDiv.style.display = 'block';
+        noteDiv.style.display = 'none';
+        // Clear previous selectors
+        individualDiv.innerHTML = '';
+        var start = document.getElementById('service_start').value;
+        var end = document.getElementById('service_end').value;
+        if (start && end) {
+            var startDate = new Date(start);
+            var endDate = new Date(end);
+            for (var d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+                var dateStr = d.toISOString().slice(0, 10);
+                var label = document.createElement('label');
+                label.innerText = 'Service Type for ' + d.toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'});
+                var select = document.createElement('select');
+                select.name = 'service_type_' + dateStr;
+                select.id = 'service_type_' + dateStr;
+                select.innerHTML = `
+                    <option value='Airport Transfer'>Airport Transfer</option>
+                    <option value='4 Hours Service'>4 Hours Service</option>
+                    <option value='6 Hours Service'>6 Hours Service</option>
+                    <option value='9 Hours Service'>9 Hours Service</option>
+                    <option value='12 Hours Service'>12 Hours Service</option>
+                `;
+                individualDiv.appendChild(label);
+                individualDiv.appendChild(select);
+                // Add note field
+                var noteLabel = document.createElement('label');
+                noteLabel.innerText = 'Note for ' + d.toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'});
+                var noteInput = document.createElement('input');
+                noteInput.type = 'text';
+                noteInput.name = 'note_' + dateStr;
+                noteInput.id = 'note_' + dateStr;
+                noteInput.placeholder = 'e.g. 9 PM at Westin';
+                individualDiv.appendChild(noteLabel);
+                individualDiv.appendChild(noteInput);
+                individualDiv.appendChild(document.createElement('br'));
+            }
+        }
+    }
+}
+document.getElementById('service_start').addEventListener('change', toggleRangeServiceTypeMode);
+document.getElementById('service_end').addEventListener('change', toggleRangeServiceTypeMode);
+function addDateField() {
+    if (dateCount >= maxDates) return;
+    dateCount++;
+    const dateFields = document.getElementById('date_fields');
+    const div = document.createElement('div');
+    div.className = 'date-row';
+    div.id = `date_row_${dateCount}`;
+    div.innerHTML = `
+        <label for='service_date${dateCount}'>Date ${dateCount}:</label>
+        <input type='date' name='service_date${dateCount}' id='service_date${dateCount}' onchange='renderMultipleDateFields()'>
+    `;
+    dateFields.appendChild(div);
+    if (dateCount === maxDates) {
+        document.getElementById('add_date_btn').disabled = true;
+    }
+    renderMultipleDateFields();
+}
+function renderMultipleDateFields() {
+    var sameType = document.getElementById('same_service_type').checked;
+    var dateFields = document.getElementById('date_fields');
+    var allSelector = document.getElementById('service_type_all_selector');
+    var allNote = document.getElementById('service_type_all_note');
+    // Remove previous dynamic fields
+    var oldFields = document.querySelectorAll('.multi-dynamic');
+    oldFields.forEach(function(el) { el.remove(); });
+    // Show/hide Service Type for All Dates selector and note
+    allSelector.style.display = sameType ? 'flex' : 'none';
+    allNote.style.display = sameType ? 'flex' : 'none';
+    if (!sameType) {
+        for (var i = 1; i <= dateCount; i++) {
+            var dateInput = document.getElementById('service_date' + i);
+            if (dateInput && dateInput.value) {
+                var dateStr = dateInput.value;
+                var label = document.createElement('label');
+                label.className = 'multi-dynamic';
+                label.innerText = 'Service Type for ' + new Date(dateStr).toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'});
+                var select = document.createElement('select');
+                select.className = 'multi-dynamic';
+                select.name = 'service_type_' + dateStr;
+                select.id = 'service_type_' + dateStr;
+                select.innerHTML = `
+                    <option value='Airport Transfer'>Airport Transfer</option>
+                    <option value='4 Hours Service'>4 Hours Service</option>
+                    <option value='6 Hours Service'>6 Hours Service</option>
+                    <option value='9 Hours Service'>9 Hours Service</option>
+                    <option value='12 Hours Service'>12 Hours Service</option>
+                `;
+                var noteLabel = document.createElement('label');
+                noteLabel.className = 'multi-dynamic';
+                noteLabel.innerText = 'Note for ' + new Date(dateStr).toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'});
+                var noteInput = document.createElement('input');
+                noteInput.className = 'multi-dynamic';
+                noteInput.type = 'text';
+                noteInput.name = 'note_' + dateStr;
+                noteInput.id = 'note_' + dateStr;
+                noteInput.placeholder = 'e.g. 9 PM at Westin';
+                dateFields.appendChild(label);
+                dateFields.appendChild(select);
+                dateFields.appendChild(noteLabel);
+                dateFields.appendChild(noteInput);
+            }
+        }
+    }
+}
+document.getElementById('same_service_type').addEventListener('change', renderMultipleDateFields);
+window.onload = function() {
+    toggleDateMode();
+};
+function openDatePickerOnLocationChange(locationSelectorId, dateInputId) {
+    var locationSelector = document.getElementById(locationSelectorId);
+    var dateInput = document.getElementById(dateInputId);
+    if (locationSelector && dateInput) {
+        locationSelector.addEventListener('change', function() {
+            dateInput.focus();
+            dateInput.click();
+        });
+    }
+}
+// Example usage for main location and date fields
+openDatePickerOnLocationChange('service_location', 'service_start');
+openDatePickerOnLocationChange('service_location', 'service_end');
+// For dynamically added multiple date fields, you may need to call this after adding each new field
+</script>
+</body>
+</html>
