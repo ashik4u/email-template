@@ -28,7 +28,7 @@ This is a Flask-based web application for generating and managing business email
 
 ## Example: Adding a Guest
 ```
-prabir|Prabir Mitra|prabir.mitra@pwc.com|+8801847355747|4980026|front-aisle seat, complimentary non-veg meal (non-veg sandwich)
+olivia|Olivia Carter|olivia.carter@example.com|+919830014397|4980104|front-aisle seats (free options only), 6E Curated Snacks Bag
 ```
 
 ## External Dependencies
