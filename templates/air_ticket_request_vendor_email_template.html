@@ -21,10 +21,10 @@
     <div id="notification-bar"></div>
     <div id="email-content">
         {% if guest %}
-        <p>Dear Mr. Zilan,<br><br>
+        <p>Dear Mr. Robert,<br><br>
         {% if guest.id == 'olivia' %}
         Please see the email below for your reference. Kindly issue the ticket and update the travel tracker. Please book {{ guest.instructions }}.<br><br>
-        {% elif guest.id == 'Lee' %}
+        {% elif guest.id == 'mason' %}
         Please issue the ticket and update the travel tracker as per the email confirmation below. Depending on availability, kindly book a {{ guest.instructions }}.<br><br>
         {% else %}
         Please issue the ticket and update the travel tracker as per the email confirmation below.<br><br>
