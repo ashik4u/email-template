@@ -1,4 +1,4 @@
-# Copilot Instructions for Email Template Project
+# Instructions for Email Template Project
 
 ## Project Overview
 This is a Flask-based web application for generating and managing business email templates (cab requests, hotel reservations, air ticket requests, etc.). The app is designed for rapid, form-driven email creation with copy-to-clipboard functionality and a dashboard for navigation.
